@@ -132,6 +132,10 @@ Méta-repo ("umbrella") orchestrant une douzaine de dépôts indépendants (micr
 ## Historique de Commits & Activité
 
 <p align="center">
+  <img width="100%" src="https://github-readme-activity-graph.vercel.app/graph?username=VictorAgahi&theme=tokyo-night&hide_border=true&area=true&from=2026-01-01" alt="Commit activity since January 1st" />
+</p>
+
+<p align="center">
   <img src="https://streak-stats.demolab.com/?user=VictorAgahi&theme=tokyonight&hide_border=true" alt="GitHub streak" />
 </p>
 
