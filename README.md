@@ -139,6 +139,13 @@ Méta-repo ("umbrella") orchestrant une douzaine de dépôts indépendants (micr
   <img src="https://streak-stats.demolab.com/?user=VictorAgahi&theme=tokyonight&hide_border=true" alt="GitHub streak" />
 </p>
 
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/VictorAgahi/VictorAgahi/output/dist/snake-dark.svg" />
+    <img alt="Contribution snake animation" src="https://raw.githubusercontent.com/VictorAgahi/VictorAgahi/output/dist/snake.svg" width="100%" />
+  </picture>
+</p>
+
 <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png" width="100%">
 
 ## Statistiques GitHub
