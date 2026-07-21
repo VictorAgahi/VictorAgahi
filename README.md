@@ -1,12 +1,12 @@
 <div align="center">
 
 <a href="https://git.io/typing-svg">
-  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=26&pause=1000&color=38BDF8&center=true&vCenter=true&width=600&lines=Full-Stack+%26+Systems+Engineer;NestJS+%2F+Next.js+%2F+Rust+%2F+Go;Building+secure%2C+scalable+platforms;Kubernetes+%2B+GitOps+enthusiast" alt="Typing SVG" />
+  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=26&pause=1000&color=38BDF8&center=true&vCenter=true&width=600&lines=Backend+%26+Systems+Engineer;NestJS+%2F+Fastify+%2F+Rust+%2F+Go;Building+secure%2C+scalable+platforms;Kubernetes+%2B+GitOps+enthusiast" alt="Typing SVG" />
 </a>
 
 ### Victor Agahi
 
-Software engineer building full-stack platforms and polyglot backend systems — from encrypted data vaults to real-time market intelligence pipelines, self-hosted on Kubernetes.
+Backend engineer building distributed, event-driven platforms and polyglot systems — from encrypted data vaults to real-time market intelligence pipelines, self-hosted on Kubernetes.
 
 <p>
   <a href="mailto:victor.agahi@epita.fr"><img src="https://img.shields.io/badge/Email-D14836?style=for-the-badge&logo=gmail&logoColor=white" /></a>
@@ -62,58 +62,70 @@ Software engineer building full-stack platforms and polyglot backend systems —
 
 ## Projets en Vedette
 
-<table>
-<tr>
-<td width="50%" valign="top">
-
-### [VaultedMind](https://github.com/VictorAgahi/VaultedMind)
-Vault mental-health "zero trust" avec chiffrement AES-256-GCM au repos, blind indexing des données sensibles et isolation réseau stricte sur Kubernetes.
+### [VaultedMind](https://github.com/VictorAgahi/VaultedMind) — Coffre-fort santé mentale, zero-trust
 
 ![Next.js](https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=nextdotjs&logoColor=white)
 ![NestJS](https://img.shields.io/badge/NestJS-E0234E?style=flat-square&logo=nestjs&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white)
 ![Kubernetes](https://img.shields.io/badge/Kubernetes-326CE5?style=flat-square&logo=kubernetes&logoColor=white)
 
-</td>
-<td width="50%" valign="top">
+Application full-stack pour journaliser humeur et réflexions personnelles sans jamais exposer la donnée brute, même en interne.
 
-### [SentiGraph Finance](https://github.com/VictorAgahi/sentigraph-finance)
-Plateforme de market intelligence temps réel : ingestion crypto haute fréquence, analyse de sentiment IA et order-flow monitoring, sur une architecture microservices polyglotte.
+- **Chiffrement au repos** : chaque champ sensible est chiffré en AES-256-GCM avant persistance ; les emails sont protégés par blind indexing pour permettre une recherche sans exposer le PII.
+- **Isolation réseau stricte** : NetworkPolicies Kubernetes garantissant que seul le frontend parle au backend, et seul le backend parle à la base de données.
+- **Module IA d'insights** (`ai-insights`) en architecture hexagonale (`domain` / `application` / `infrastructure`) : un `data-sanitizer.service` anonymise les journaux avant tout appel LLM, un `prompt.service` construit les prompts, et un cron génère périodiquement des insights personnalisés.
+- **CI/CD & sécurité** : pipelines GitHub Actions avec scan de secrets, déploiement GitOps via ArgoCD/Kustomize.
+
+---
+
+### [SentiGraph Finance](https://github.com/VictorAgahi/sentigraph-finance) — Market intelligence crypto temps réel
 
 ![Rust](https://img.shields.io/badge/Rust-000000?style=flat-square&logo=rust&logoColor=white)
 ![Go](https://img.shields.io/badge/Go-00ADD8?style=flat-square&logo=go&logoColor=white)
 ![Next.js](https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=nextdotjs&logoColor=white)
 ![Redis](https://img.shields.io/badge/Redis-DC382D?style=flat-square&logo=redis&logoColor=white)
 
-</td>
-</tr>
-<tr>
-<td width="50%" valign="top">
+Architecture microservices polyglotte pensée pour la faible latence, composée de quatre services indépendants reliés par un backbone Redis (DragonflyDB) :
 
-### [NightQuizz](https://github.com/MasterNIghtQuizz/head)
-Plateforme de quiz en direct construite en microservices DDD (gateway, user, quiz, session, réponses) avec auth zero-trust par tokens internes, événementiel Kafka idempotent et observabilité OpenTelemetry/Jaeger/OpenSearch.
+- **Harvester (Rust)** : ingestion haute fréquence des flux WebSocket Binance Futures (ticker, profondeur de marché, liquidations), avec reconnexion automatique à backoff exponentiel.
+- **Analyst (Go)** : pool de workers pour l'analyse de sentiment via Ollama, persistance batch dans TimescaleDB, diffusion temps réel par WebSocket.
+- **Scout (Go)** : veille RSS multi-sources et Nitter, redirigée vers l'Analyst pour scoring de sentiment.
+- **Dashboard (Next.js)** : terminal de monitoring avec `lightweight-charts`, mise à jour sub-seconde pilotée par WebSocket.
+
+---
+
+### [NightQuizz](https://github.com/MasterNIghtQuizz/head) — Plateforme de quiz live, microservices DDD
 
 ![Fastify](https://img.shields.io/badge/Fastify-000000?style=flat-square&logo=fastify&logoColor=white)
 ![Kafka](https://img.shields.io/badge/Kafka-231F20?style=flat-square&logo=apachekafka&logoColor=white)
+![Valkey](https://img.shields.io/badge/Valkey-A41E11?style=flat-square&logo=redis&logoColor=white)
 ![Next.js](https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=nextdotjs&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white)
 
-</td>
-</tr>
-<tr>
-<td width="50%" valign="top">
+Monorepo Yarn (Fastify + Domain-Driven Design) découpé en cinq services : `api-gateway`, `ms-user`, `ms-quiz-management`, `ms-session`, `ms-response`, plus un `ws-service` dédié au temps réel.
 
-### [Volontariapp](https://github.com/Volontariapp/meta)
-Écosystème complet connectant bénévoles et associations : méta-repo orchestrant des microservices NestJS/gRPC, une app mobile React Native (Expo), un bus d'événements Redis Streams/BullMQ et un déploiement K3s + ArgoCD GitOps.
+- **Auth zero-trust en cascade** : le gateway vérifie le JWT externe puis mint un token interne signé (RSA) par requête ; chaque microservice le revalide via des hooks Fastify (`hookAccessToken`/`hookInternalToken`) sans jamais faire confiance à un appel direct.
+- **Kafka avec idempotence garantie** : chaque événement (`USER_CREATED`, etc.) porte un `eventId` UUID ; les consommateurs le confrontent à une table `processed_events` dans la même transaction TypeORM, assurant un traitement *exactly-once* malgré la sémantique *at-least-once* de Kafka.
+- **Valkey** comme cache/broker (fork open-source de Redis) partagé entre les services, déployé via des manifests Kubernetes dédiés (`k8s/services/cache`).
+- **Observabilité complète** : OpenTelemetry pour le traçage distribué, Jaeger pour la visualisation des traces, OpenSearch + Dashboards pour la centralisation des logs, et des dashboards Grafana/Prometheus custom.
+- **Déploiement** : Docker Compose multi-profils (`infra`/`app`) en local, manifests K8s + overlays ArgoCD pour la prod.
+
+---
+
+### [Volontariapp](https://github.com/Volontariapp/meta) — Écosystème bénévolat, event-driven à l'échelle
 
 ![NestJS](https://img.shields.io/badge/NestJS-E0234E?style=flat-square&logo=nestjs&logoColor=white)
 ![React Native](https://img.shields.io/badge/React_Native-20232A?style=flat-square&logo=react&logoColor=61DAFB)
 ![Redis](https://img.shields.io/badge/Redis-DC382D?style=flat-square&logo=redis&logoColor=white)
-![Kubernetes](https://img.shields.io/badge/Kubernetes-326CE5?style=flat-square&logo=kubernetes&logoColor=white)
+![Neo4j](https://img.shields.io/badge/Neo4j-4581C3?style=flat-square&logo=neo4j&logoColor=white)
 
-</td>
-</tr>
-</table>
+Méta-repo ("umbrella") orchestrant une douzaine de dépôts indépendants (microservices, workers, app mobile, packages partagés), documentés selon le **modèle C4** (contexte, containers, flux async, déploiement).
+
+- **Transactional Outbox Pattern** : chaque microservice insère sa donnée métier et un job "pending" dans la même transaction ACID Postgres, éliminant le "dual write problem" entre la base et le bus d'événements.
+- **Pipeline job → audit → stream** : un `outbox-runner` pousse les jobs vers BullMQ (Redis) ; un `worker` les exécute et journalise le résultat, ce qui déclenche un **trigger SQL automatique** republiant l'événement vers un Redis Stream, consommé à son tour par des `post-processors`.
+- **Scatter-Gather orchestré par WebSocket** : à la création d'un événement, plusieurs post-processors indépendants (géocodage, écriture dans le graphe Neo4j `ms-social`) travaillent en parallèle ; le `ws-service` agrège leurs accusés de réception par `correlation_id` et ne notifie le client qu'une fois toutes les étapes confirmées — avec Saga compensatoire (rollback Neo4j) en cas d'échec partiel.
+- **gRPC synchrone + Redis asynchrone** : l'API Gateway route les requêtes rapides en gRPC vers les microservices isolés (chacun avec sa propre base Postgres), tandis que tout traitement lourd est délégué à la tuyauterie événementielle.
+- **Sécurité GitOps** : cluster K3s en Pod Security Admissions "Restricted" (non-root, read-only filesystem, seccomp), secrets chiffrés via Bitnami Sealed Secrets, Network Policies en default-deny entre domaines.
+- **Mobile** : application React Native (Expo 54) consommant ce même écosystème via l'API Gateway.
 
 <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png" width="100%">
 
