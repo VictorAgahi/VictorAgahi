@@ -9,9 +9,9 @@
 Backend engineer building distributed, event-driven platforms and polyglot systems — from encrypted data vaults to real-time market intelligence pipelines, self-hosted on Kubernetes.
 
 <p>
-  <a href="mailto:victor.agahi@epita.fr"><img src="https://img.shields.io/badge/Email-D14836?style=for-the-badge&logo=gmail&logoColor=white" /></a>
+  <a href="mailto:victor@agahi.com"><img src="https://img.shields.io/badge/Email-D14836?style=for-the-badge&logo=gmail&logoColor=white" /></a>
   <a href="https://github.com/VictorAgahi"><img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" /></a>
-  <a href="https://www.linkedin.com/"><img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" /></a>
+  <a href="https://www.linkedin.com/in/victor-agahi-49b97b292/"><img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" /></a>
 </p>
 
 </div>
@@ -136,16 +136,8 @@ Méta-repo ("umbrella") orchestrant une douzaine de dépôts indépendants (micr
 </p>
 
 <p align="center">
-  <img src="https://github-readme-streak-stats.herokuapp.com/?user=VictorAgahi&theme=tokyonight&hide_border=true" alt="GitHub streak" />
+  <img src="https://streak-stats.demolab.com/?user=VictorAgahi&theme=tokyonight&hide_border=true" alt="GitHub streak" />
 </p>
-
-<div align="center">
-
-<!--START_SECTION:waka-->
-<img src="https://raw.githubusercontent.com/VictorAgahi/VictorAgahi/output/snake.svg" alt="Contribution snake animation" width="100%" />
-<!--END_SECTION:waka-->
-
-</div>
 
 <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png" width="100%">
 
