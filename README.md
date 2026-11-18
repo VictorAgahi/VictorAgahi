@@ -82,6 +82,124 @@
 
 ## Featured Projects
 
+### [Volontariapp](https://github.com/Volontariapp/meta) — Scalable Event-Driven Volunteering Ecosystem (22 Repositories)
+
+[![Organization](https://img.shields.io/badge/GitHub_Org-@Volontariapp-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/Volontariapp)
+![NestJS](https://img.shields.io/badge/NestJS-E0234E?style=flat-square&logo=nestjs&logoColor=white)
+![Go](https://img.shields.io/badge/Go-00ADD8?style=flat-square&logo=go&logoColor=white)
+![gRPC](https://img.shields.io/badge/gRPC-244C5A?style=flat-square&logo=grpc&logoColor=white)
+![Protobuf](https://img.shields.io/badge/Protobuf-4285F4?style=flat-square&logo=google&logoColor=white)
+![Redis Streams](https://img.shields.io/badge/Redis_Streams-DC382D?style=flat-square&logo=redis&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white)
+![Neo4j](https://img.shields.io/badge/Neo4j-4581C3?style=flat-square&logo=neo4j&logoColor=white)
+![Kubernetes](https://img.shields.io/badge/Kubernetes-326CE5?style=flat-square&logo=kubernetes&logoColor=white)
+![ArgoCD](https://img.shields.io/badge/ArgoCD-EF7B4D?style=flat-square&logo=argo&logoColor=white)
+![React Native](https://img.shields.io/badge/React_Native-20232A?style=flat-square&logo=react&logoColor=61DAFB)
+
+Enterprise-grade distributed ecosystem orchestrating **22 independent repositories** across microservices, asynchronous stream workers, infrastructure GitOps, shared libraries, and cross-platform clients, architected according to the **C4 model**.
+
+```mermaid
+flowchart TD
+    subgraph Clients["Clients & Ingestion"]
+        Mobile["Mobile App (React Native / Expo 54)"]
+        Simulator["Traffic Simulator (Go / Synthetic Load)"]
+    end
+
+    subgraph Edge["Edge & Gateways (K3s / Traefik)"]
+        Gateway["API Gateway (NestJS / Fastify)"]
+        WS["WebSocket Gateway (ws-service)"]
+    end
+
+    subgraph Services["Core Domain Microservices (ACID Postgres per service)"]
+        User["ms-user (Auth & RBAC)"]
+        Event["ms-event (Events Management)"]
+        Social["ms-social (Graph & Feeds)"]
+        Ranking["ms-ranking (Gamification)"]
+        Storage["ms-storage (S3 Assets)"]
+    end
+
+    subgraph AsyncBus["Event-Driven Backbone"]
+        Outbox["outbox-runner"]
+        BullMQ["BullMQ (Redis Queues)"]
+        Worker["workers-runner"]
+        Streams["Redis Streams (Pub/Sub Event Bus)"]
+        PostProc["post-processors (Async Pipeline)"]
+    end
+
+    subgraph Data["Persistent Storage"]
+        Postgres[("PostgreSQL (Outbox Table)")]
+        Neo4j[("Neo4j Graph Database")]
+    end
+
+    Mobile -->|REST / HTTPS| Gateway
+    Mobile <-->|WSS (Real-time sync)| WS
+    Simulator -->|gRPC High-Throughput Load| Gateway
+
+    Gateway -->|gRPC (proto-registry)| User
+    Gateway -->|gRPC (proto-registry)| Event
+    Gateway -->|gRPC (proto-registry)| Social
+
+    Event -->|1. Atomic Transaction (Entity + Job)| Postgres
+    Outbox -->|2. Poll Pending Jobs| Postgres
+    Outbox -->|3. Enqueue| BullMQ
+    BullMQ -->|4. Execute| Worker
+    Worker -->|5. SQL Trigger Notification| Streams
+    Streams -->|6. XREADGROUP| PostProc
+    PostProc -->|7. Graph Sync & Rollback Saga| Neo4j
+    PostProc -->|8. Status Acknowledgment| WS
+    WS -->|9. Push Confirmation| Mobile
+```
+
+#### Core Architectural Patterns & Highlights
+
+- **Transactional Outbox & Dual-Write Elimination**: Each business mutation atomically commits the domain entity and an `outbox_job` inside the same PostgreSQL ACID transaction. Dual-write discrepancies between the relational datastore and the message bus are mathematically impossible.
+- **Job → Audit → Stream Pipeline**: The dedicated [`outbox-runner`](https://github.com/Volontariapp/outbox-runner) dispatches jobs into BullMQ (Redis). A [`workers-runner`](https://github.com/Volontariapp/workers-runner) processes jobs and commits execution logs, firing an **automatic PostgreSQL trigger** that streams events into Redis Streams for multi-subscriber ingestion by [`post-processors`](https://github.com/Volontariapp/post-processors).
+- **Asynchronous Scatter-Gather & Compensating Sagas**: When a volunteer mission or social event is scheduled, concurrent post-processors execute geocoding, ranking calculations, and Neo4j graph projections in parallel. The [`ws-service`](https://github.com/Volontariapp/ws-service) aggregates acknowledgments via `correlation_id` before notifying connected clients via WebSocket, executing a rollback Saga in case of partial graph write failure.
+- **Contract Governance via Protobuf Registry**: All inter-service communications rely on strongly-typed gRPC interfaces governed within [`proto-registry`](https://github.com/Volontariapp/proto-registry), automating code generation for Go, TypeScript, and Python stubs.
+- **Resilience & Synthetic Load Testing**: High-throughput benchmarking and real-time stress testing driven by [`traffic-simulator`](https://github.com/Volontariapp/traffic-simulator), validating backpressure thresholds and WebSocket connection churn under peak loads.
+- **Hardened GitOps Kubernetes Delivery**: Managed across [`deploy`](https://github.com/Volontariapp/deploy) on K3s with ArgoCD overlays, adhering to **Restricted Pod Security Standards** (non-root execution, read-only root filesystems, seccomp profiles, Bitnami Sealed Secrets, and default-deny NetworkPolicies).
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Client as Mobile Client
+    participant GW as API Gateway
+    participant MS as ms-event
+    participant PG as PostgreSQL
+    participant OB as outbox-runner
+    participant BM as BullMQ (Redis)
+    participant WR as workers-runner
+    participant RS as Redis Streams
+    participant PP as post-processors
+    participant N4 as Neo4j Graph
+    participant WS as ws-service
+
+    Client->>GW: POST /events (Create Event)
+    GW->>MS: gRPC CreateEvent()
+    rect rgb(240, 248, 255)
+        Note over MS,PG: Atomic Transaction (ACID)
+        MS->>PG: INSERT INTO events + INSERT INTO outbox_jobs
+    end
+    MS-->>GW: Ack Created (Correlation ID)
+    GW-->>Client: 201 Created (Pending validation)
+
+    OB->>PG: Poll outbox_jobs (status = PENDING)
+    OB->>BM: Enqueue Job
+    BM->>WR: Dispatch Job
+    WR->>PG: Mark COMPLETED (SQL Trigger fires)
+    PG-->>RS: XADD event.created (Redis Stream)
+
+    par Parallel Processing & Projection
+        RS->>PP: Consume event.created
+        PP->>N4: Project into Neo4j Social Graph
+    and Real-Time Gateway Sync
+        PP->>WS: Emit Event Acknowledged (correlation_id)
+        WS-->>Client: WebSocket Push (Event Confirmed Live)
+    end
+```
+
+---
+
 ### [Causal Mesh](https://github.com/VictorAgahi/causalmesh) — High-Performance Polyglot Codebase Graph & MCP Server
 
 ![Rust](https://img.shields.io/badge/Rust-CE412B?style=flat-square&logo=rust&logoColor=white)
@@ -150,20 +268,3 @@ Yarn monorepo (Fastify + Domain-Driven Design) partitioned into five services: `
 - **Deployment**: Multi-profile Docker Compose (`infra`/`app`) for local development, K8s manifests with ArgoCD overlays for production.
 
 ---
-
-### [Volontariapp](https://github.com/Volontariapp/meta) — Scalable Event-Driven Volunteering Ecosystem
-
-![NestJS](https://img.shields.io/badge/NestJS-E0234E?style=flat-square&logo=nestjs&logoColor=white)
-![React Native](https://img.shields.io/badge/React_Native-20232A?style=flat-square&logo=react&logoColor=61DAFB)
-![Redis](https://img.shields.io/badge/Redis-DC382D?style=flat-square&logo=redis&logoColor=white)
-![Neo4j](https://img.shields.io/badge/Neo4j-4581C3?style=flat-square&logo=neo4j&logoColor=white)
-![Kubernetes](https://img.shields.io/badge/Kubernetes-326CE5?style=flat-square&logo=kubernetes&logoColor=white)
-
-Umbrella meta-repository orchestrating a dozen independent repositories (microservices, workers, mobile app, shared packages), documented according to the **C4 model** (context, containers, async flows, deployment).
-
-- **Transactional Outbox Pattern**: Each microservice writes its business entity and a pending job within the same ACID Postgres transaction, eliminating dual-write issues between the database and the message bus.
-- **Job → Audit → Stream Pipeline**: An `outbox-runner` pushes jobs to BullMQ (Redis); a `worker` executes them and logs the execution result, triggering an **automatic SQL trigger** that republishes the event to a Redis Stream, consumed in turn by `post-processors`.
-- **WebSocket-Orchestrated Scatter-Gather**: When an event is created, multiple independent post-processors (geocoding, Neo4j graph writes in `ms-social`) run in parallel; `ws-service` aggregates acknowledgments by `correlation_id` and only notifies the client once all steps succeed — with a compensating Saga (Neo4j rollback) upon partial failure.
-- **Synchronous gRPC + Asynchronous Redis**: The API Gateway routes fast synchronous requests via gRPC to isolated microservices (each with its own Postgres database), while heavy asynchronous processing is handled by the Redis event streaming pipeline.
-- **GitOps & Hardened Security**: K3s cluster with "Restricted" Pod Security Admissions (non-root, read-only root filesystem, seccomp), secrets encrypted using Bitnami Sealed Secrets, and default-deny NetworkPolicies across domains.
-- **Mobile**: Cross-platform React Native app (Expo 54) consuming the ecosystem via the API Gateway.
