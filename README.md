@@ -89,31 +89,40 @@
 ![NestJS](https://img.shields.io/badge/NestJS-E0234E?style=flat-square&logo=nestjs&logoColor=white)
 ![Go](https://img.shields.io/badge/Go-00ADD8?style=flat-square&logo=go&logoColor=white)
 ![gRPC](https://img.shields.io/badge/gRPC-244C5A?style=flat-square&logo=grpc&logoColor=white)
+![Protobuf](https://img.shields.io/badge/Protobuf-4285F4?style=flat-square&logo=google&logoColor=white)
 ![Redis Streams](https://img.shields.io/badge/Redis_Streams-DC382D?style=flat-square&logo=redis&logoColor=white)
 ![Neo4j](https://img.shields.io/badge/Neo4j-4581C3?style=flat-square&logo=neo4j&logoColor=white)
 ![Kubernetes](https://img.shields.io/badge/Kubernetes-326CE5?style=flat-square&logo=kubernetes&logoColor=white)
 ![ArgoCD](https://img.shields.io/badge/ArgoCD-EF7B4D?style=flat-square&logo=argo&logoColor=white)
 
-Écosystème distribué de **22 micro-dépôts** architecturé selon le **modèle C4** : 6 microservices de domaine synchrones (gRPC / Protobuf), une dorsale asynchrone (Transactional Outbox, BullMQ, Redis Streams) et une livraison continue GitOps sur cluster Kubernetes K3s.
+Distributed polyglot ecosystem of **22 independent repositories** architected around the **C4 model**: 6 synchronous domain microservices (gRPC / Protobuf), an asynchronous event-driven backbone (Transactional Outbox, BullMQ, Redis Streams), and GitOps continuous delivery on a hardened Kubernetes (K3s) cluster.
 
-```mermaid
-flowchart LR
-    A["Clients (React Native & Simulator)"] -->|HTTPS / WSS| B["API & WS Gateways"]
-    B -->|gRPC / Protobuf| C["6 Microservices de Domaine"]
-    C -->|Transactional Outbox| D["Dorsale Asynchrone (BullMQ & Redis Streams)"]
-    D -->|Sagas & Projections| E[("PostgreSQL · Neo4j · S3")]
-```
+<p align="center">
+  <img src="assets/volontariapp-sync-architecture.png" alt="Volontariapp Synchronous gRPC Microservices Architecture" width="90%" />
+</p>
 
-#### 📐 Spécifications & Modèle C4 (Documentation Complète)
+<p align="center">
+  <img src="assets/volontariapp-async-architecture.png" alt="Volontariapp Asynchronous Event-Driven Outbox & Scatter-Gather" width="90%" />
+</p>
 
-Pour explorer l'ensemble des diagrammes d'architecture C4, des contrats d'interface et des flux asynchrones, référez-vous au dépôt officiel de documentation [**Volontariapp/docs**](https://github.com/Volontariapp/docs) :
+#### Core Architectural Patterns & Highlights
 
-- [**C1 - System Context**](https://github.com/Volontariapp/docs/blob/main/architecture/C1-System-Context.md) : Vue macro-système, acteurs et frontières externes.
-- [**C2 - Containers**](https://github.com/Volontariapp/docs/blob/main/architecture/C2-Containers.md) : Cartographie des 6 domaines (`user`, `event`, `post`, `social`, `storage`, `ranking`), contrats d'API gRPC centralisés dans [`proto-registry`](https://github.com/Volontariapp/proto-registry) et passerelle WebSocket.
-- [**C3 - Async Patterns & Flows**](https://github.com/Volontariapp/docs/blob/main/architecture/C3-Async-Patterns-And-Flows.md) : Mécanique du Transactional Outbox, triggers SQL `job_audit`, cycle de vie des workers BullMQ et Scatter-Gather temps réel.
-- [**C4 - Deployment & Infrastructure**](https://github.com/Volontariapp/docs/blob/main/architecture/C4-Deployment-And-Infrastructure.md) : Vision GitOps avec ArgoCD, ingress Traefik, Sealed Secrets et NetworkPolicies restrictives dans [`deploy`](https://github.com/Volontariapp/deploy).
-- [**Étude : Montée en charge (200 à 300 req/s)**](https://github.com/Volontariapp/docs/tree/main/montee-en-charge) : Métriques de charge synthétique, analyses de contention et benchs via [`traffic-simulator`](https://github.com/Volontariapp/traffic-simulator).
-- [**Étude : Optimisation des écritures & Idempotence**](https://github.com/Volontariapp/docs/tree/main/optimisation-ecritures) : Élimination des doubles écritures et batching transactionnel.
+- **Synchronous Domain Isolation (gRPC)**: The API Gateway routes incoming client traffic via strongly-typed gRPC interfaces governed within [`proto-registry`](https://github.com/Volontariapp/proto-registry). Domain services (`ms-user`, `ms-event`, `ms-post`, `ms-social`, `ms-storage`, `ms-ranking`) each manage their own isolated PostgreSQL database with strict schema autonomy.
+- **Transactional Outbox & Dual-Write Elimination**: State transitions atomically commit the business entity and an `outbox_job` inside the same PostgreSQL ACID transaction, mathematically eliminating dual-write inconsistencies between the relational datastore and the message broker.
+- **Job → Audit → Stream Pipeline**: Dedicated [`outbox-runners`](https://github.com/Volontariapp/outbox-runners) dispatch pending jobs into BullMQ. The [`workers-runners`](https://github.com/Volontariapp/workers-runners) process workloads and record audit logs, firing an automated SQL trigger that republishes events to Redis Streams for multi-subscriber ingestion by [`post-processors`](https://github.com/Volontariapp/post-processors).
+- **Asynchronous Scatter-Gather & Sagas**: Parallel post-processors handle address geocoding, Neo4j social graph indexing, and gamification points simultaneously. The [`ws-service`](https://github.com/Volontariapp/ws-service) aggregates acknowledgments via `correlation_id` before notifying mobile clients in real time over WebSockets, executing a compensating rollback Saga if graph operations fail.
+- **GitOps & Hardened Cloud Infrastructure**: Full continuous delivery managed across [`deploy`](https://github.com/Volontariapp/deploy) using ArgoCD on K3s, enforced with **Restricted Pod Security Standards** (non-root runtimes, read-only root filesystems, seccomp profiles, Bitnami Sealed Secrets, and default-deny NetworkPolicies).
+
+#### 📐 Complete C4 Architecture & Specifications
+
+In-depth technical specifications, sequence diagrams, and scalability benchmarks are documented in the official [**Volontariapp/docs**](https://github.com/Volontariapp/docs) repository:
+
+- [**C1 - System Context**](https://github.com/Volontariapp/docs/blob/main/architecture/C1-System-Context.md): System boundaries, external providers (S3 storage, Jev AI), and actor workflows.
+- [**C2 - Containers**](https://github.com/Volontariapp/docs/blob/main/architecture/C2-Containers.md): Detailed breakdown of the 6 core domains, ports, inter-service contracts, and WebSocket gateway.
+- [**C3 - Async Patterns & Flows**](https://github.com/Volontariapp/docs/blob/main/architecture/C3-Async-Patterns-And-Flows.md): Deep dive into the Transactional Outbox, SQL audit triggers, BullMQ worker lifecycle, and Saga orchestrations.
+- [**C4 - Deployment & Infrastructure**](https://github.com/Volontariapp/docs/blob/main/architecture/C4-Deployment-And-Infrastructure.md): Cluster topology, ingress routing, Sealed Secrets, and network policy isolation.
+- [**Case Study: Load Testing (200 to 300 req/s)**](https://github.com/Volontariapp/docs/tree/main/montee-en-charge): Latency metrics, contention bottlenecks, and load generation using [`traffic-simulator`](https://github.com/Volontariapp/traffic-simulator).
+- [**Case Study: Write Path Optimization & Idempotency**](https://github.com/Volontariapp/docs/tree/main/optimisation-ecritures): Benchmarked strategies for eliminating database write bottlenecks and transactional outbox overhead.
 
 ---
 
